@@ -8,7 +8,7 @@ class Lesson(models.Model):
 #General Info
 	name 		= models.CharField(max_length=35) 
 	about		= models.TextField()
-	meadia_repr = models.FileField(upload_to='lessons/')
+	meadia_repr = models.ImageField(upload_to='lessons/',height_field=None, width_field=None)
 	#teacher		= models.ForeignKey('teacher.Teacher', on_delete=models.CASCADE)
 	quantity	= models.PositiveSmallIntegerField(default=25, validators=[MaxValueValidator(35)])
 
@@ -16,7 +16,7 @@ class Lesson(models.Model):
 	start_date  = models.DateField()
 	start_time  = models.TimeField() 
 	duration 	= models.TimeField()
-	#end_at 	= time
+	#end_at 	= time //For that version, ending is always on the same day. The studio doesn't support long events yet.
 
 #All information about, where lesson would be
 	loaction 	= models.URLField(default="https://goo.gl/maps/HZwWj15NgYrt2vBz9")
