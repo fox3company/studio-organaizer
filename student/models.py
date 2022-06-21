@@ -42,5 +42,11 @@ class Lesson(models.Model):
 		    ending_time += d
 		return ending_time 
 
+	def __str__(self):
+		return self.name
+
+
+
+
 
 	
