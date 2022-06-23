@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator
 from django.core.validators import RegexValidator
+from datetime import datetime, date, timedelta
+from django.utils import timezone
 
 
 class Location(models.Model):
@@ -17,20 +19,27 @@ class Studio(models.Model):
 	def __str__(self):
 		return str(self.number)
 
+class ActivityType(models.Model):
+	activity_name = models.CharField(max_length=35, default="Contempory Dance")
+	about		  = models.TextField()
+	meadia_repr   = models.ImageField(upload_to='activities/',height_field=None, width_field=None)
+
+	def __str__(self):
+		return self.activity_name
+
 class Lesson(models.Model):
 #General Info
-	name 		= models.CharField(max_length=35) 
-	about		= models.TextField()
-	meadia_repr = models.ImageField(upload_to='lessons/',height_field=None, width_field=None)
+	activity 	= models.ForeignKey('ActivityType', on_delete=models.CASCADE) 
 	teacher		= models.ForeignKey('teacher.Teacher', on_delete=models.CASCADE)
 	quantity	= models.PositiveSmallIntegerField(default=25, validators=[MaxValueValidator(35)]) #For that specifix version, iw would be no more than 35 people per room
 
-#All information about, when lesson would be	
+#All information date and time
 	start_date  = models.DateField()
 	start_time  = models.TimeField() 
 	duration 	= models.TimeField()
 	#end_at 	= time //For that version, ending is always on the same day. The studio doesn't support long events yet.
-# Where, lesson would be
+
+#All about the place
 	studio  	= models.ForeignKey('Studio',on_delete=models.CASCADE)
 	#approved = boolean
 
@@ -45,7 +54,11 @@ class Lesson(models.Model):
 		return ending_time 
 
 	def __str__(self):
-		return self.name
+		activity 		= self.activity.activity_name
+		when_date    	= self.start_date.strftime("%d %B")
+		day_of_the_week = self.start_date.strftime("%A")
+		when_hour		= self.start_time.strftime("%H:%M")
+		return f"{activity}: {when_date} {day_of_the_week} at {when_hour}"
 
 
 class Student(models.Model):
@@ -57,6 +70,31 @@ class Student(models.Model):
 
 	def __str__(self):
 		return self.name
+
+class Client(models.Model):
+	student_ptr = models.ForeignKey('Student', on_delete=models.CASCADE)
+	
+	@property
+	def expiration_date(self):
+		return self.transaction.untill 
+	# @property
+	# def remained_lessons(self):
+
+	def __str__(self):
+		return self.student_ptr.name
+
+
+class CTransactions(models.Model):
+	client			= models.ForeignKey('Client', on_delete=models.CASCADE, related_name='transaction')
+	summ 		 	= models.PositiveSmallIntegerField(default=0)
+	numb_of_lessons = models.PositiveSmallIntegerField(default=1)
+	date_tr 		= models.DateTimeField()
+	lesson			= models.ForeignKey('ActivityType', on_delete=models.CASCADE, blank=True, null=True)
+	untill		 	= models.DateField(blank=True, null=True)#default=(date.now()+timedelta(month=1))
+	class TypeOfTr(models.TextChoices):
+		CHARGE 		= "charge", "Payment: +n lessons"
+		VISIT  		= "visit",  "Visit: -1 lesson from the account"
+	type_of_tr		= models.CharField (max_length=9, choices=TypeOfTr.choices, default=TypeOfTr.CHARGE, blank=False, null=False)
 
 
 	
