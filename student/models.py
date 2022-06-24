@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator,MaxValueValidator
 from django.core.validators import RegexValidator
 from datetime import datetime, date, timedelta
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 
 class Location(models.Model):
@@ -32,6 +33,7 @@ class Lesson(models.Model):
 	activity 	= models.ForeignKey('ActivityType', on_delete=models.CASCADE) 
 	teacher		= models.ForeignKey('teacher.Teacher', on_delete=models.CASCADE)
 	quantity	= models.PositiveSmallIntegerField(default=25, validators=[MaxValueValidator(35)]) #For that specifix version, iw would be no more than 35 people per room
+	clients	    = models.ManyToManyField('Client', related_name='lessons', blank=True)
 
 #All information date and time
 	start_date  = models.DateField()
@@ -73,39 +75,51 @@ class Student(models.Model):
 
 class Client(models.Model):
 	student_ptr = models.OneToOneField('Student', on_delete=models.CASCADE, related_name='client')
-	
+	tr_count 	= models.PositiveIntegerField(default=0, editable=False)   
+
 	@property
 	def expiration_date(self):
 		return self.transaction.untill 
 	@property
 	def remained_lessons(self):
-		transactions_list = self.transaction.all()
-		# if transactions_list[0] != '+'
-		# 	error
+		if self.transaction.all():
+			transactions_list = self.transaction.all()
 
-		untill_date 	= transactions_list[0].untill
-		lessons_remain  = transactions_list[0].numb_of_lessons
-		error_lists = []
+			untill_date 	= transactions_list[0].untill
+			lessons_remain  = transactions_list[0].numb_of_lessons
+			error_lists = []
 
-		for i in range(1,len(transactions_list)):
-			transaction_date = transactions_list[i].date_tr.date()
-			if  transaction_date > untill_date:
-				lessons_remain = 0
-				untill_date    = None
-				if transactions_list[i].type_of_tr == '-':
-					error_lists += f"The vistit on {transactions_list[i].date_tr} was outside of the paid range" 
-				else:# transactions_list[i].type_of_tr  == '+'
-					lessons_remain  = transactions_list[i].numb_of_lessons
-					untill_date 	= transactions_list[i].untill
-			else: 
-				if transactions_list[i].type_of_tr == '+':
-					lessons_remain  += transactions_list[i].numb_of_lessons
-					untill_date 	+= transactions_list[i].untill
-				elif lessons_remain >= 1:
-					lessons_remain  -= 1
+			for i in range(1,len(transactions_list)):
+				transaction_date = transactions_list[i].date_tr.date()
+				if  transaction_date > untill_date:
+					lessons_remain = 0
+					untill_date    = None
+					if transactions_list[i].type_of_tr == '-':
+						error_lists += f"The vistit on {transactions_list[i].date_tr} was outside of the paid range" 
+					else:# transactions_list[i].type_of_tr  == '+'
+						lessons_remain  = transactions_list[i].numb_of_lessons
+						untill_date 	= transactions_list[i].untill
 				else: 
-					error_lists += f"The vistit on {transactions_list[i].date_tr} was out of your payment"
-		return (lessons_remain, untill_date, error_lists)	
+					if transactions_list[i].type_of_tr == '+':
+						lessons_remain  += transactions_list[i].numb_of_lessons
+						untill_date 	+= transactions_list[i].untill
+					elif lessons_remain >= 1:
+						lessons_remain  -= transactions_list[i].numb_of_lessons
+					else: 
+						error_lists += f"The vistit on {transactions_list[i].date_tr} was out of your payment"
+			return (lessons_remain, untill_date, error_lists)
+		return (0, None, [])	
+
+	def increment_tr_count(self):
+		self.tr_count += 1
+		self.save()
+		return self.tr_count
+
+	def dicrement_tr_count(self):
+		self.tr_count -= 1
+		self.save()
+		return self.tr_count
+
 
 	def __str__(self):
 		return self.student_ptr.name
@@ -118,11 +132,31 @@ class CTransactions(models.Model):
 	date_tr 		= models.DateTimeField()
 	lesson			= models.ForeignKey('ActivityType', on_delete=models.CASCADE, blank=True, null=True)
 	untill		 	= models.DateField(blank=True, null=True)#default=(date.now()+timedelta(month=1))
-	
+	cl_tr_id 		= models.PositiveIntegerField(blank=True, null=True, editable=False)
 	class TypeOfTr(models.TextChoices):
 		CHARGE 	= "+", "Payment"
 		VISIT  	= "-", "Visit ~ -1 lesson from the account"
 	type_of_tr		= models.CharField (max_length=9, choices=TypeOfTr.choices, default=TypeOfTr.CHARGE, blank=False, null=False)
+
+	def save(self, *args, **kwargs):
+		self.cl_tr_id = self.client.increment_tr_count()
+		super().save(*args, **kwargs)
+
+	def delete(self, *args, **kwargs):
+		self.client.dicrement_tr_count()
+		super().delete(*args,**kwargs)
+		
+	def clean(self):
+		tr_number 		 = self.client.tr_count
+		remained_lessons = self.client.remained_lessons[0]
+
+		if (tr_number==0 and self.type_of_tr=="-"):
+			raise ValidationError("You havn't paid to access the lesson")
+		if (remained_lessons==0 and self.type_of_tr=="-"):
+			raise ValidationError("Your remained lessons number is already 0 --> You need to extend your the subscription")
+
+	def __str__(self):
+		return f"\"{self.type_of_tr}\" #{self.id}:{self.cl_tr_id} {self.client.student_ptr.name} {self.date_tr.strftime('%d/%m/%y')}"
 
 
 	
