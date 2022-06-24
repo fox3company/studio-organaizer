@@ -72,13 +72,40 @@ class Student(models.Model):
 		return self.name
 
 class Client(models.Model):
-	student_ptr = models.ForeignKey('Student', on_delete=models.CASCADE)
+	student_ptr = models.OneToOneField('Student', on_delete=models.CASCADE, related_name='client')
 	
 	@property
 	def expiration_date(self):
 		return self.transaction.untill 
-	# @property
-	# def remained_lessons(self):
+	@property
+	def remained_lessons(self):
+		transactions_list = self.transaction.all()
+		# if transactions_list[0] != '+'
+		# 	error
+
+		untill_date 	= transactions_list[0].untill
+		lessons_remain  = transactions_list[0].numb_of_lessons
+		error_lists = []
+
+		for i in range(1,len(transactions_list)):
+			transaction_date = transactions_list[i].date_tr.date()
+			if  transaction_date > untill_date:
+				lessons_remain = 0
+				untill_date    = None
+				if transactions_list[i].type_of_tr == '-':
+					error_lists += f"The vistit on {transactions_list[i].date_tr} was outside of the paid range" 
+				else:# transactions_list[i].type_of_tr  == '+'
+					lessons_remain  = transactions_list[i].numb_of_lessons
+					untill_date 	= transactions_list[i].untill
+			else: 
+				if transactions_list[i].type_of_tr == '+':
+					lessons_remain  += transactions_list[i].numb_of_lessons
+					untill_date 	+= transactions_list[i].untill
+				elif lessons_remain >= 1:
+					lessons_remain  -= 1
+				else: 
+					error_lists += f"The vistit on {transactions_list[i].date_tr} was out of your payment"
+		return (lessons_remain, untill_date, error_lists)	
 
 	def __str__(self):
 		return self.student_ptr.name
@@ -91,9 +118,10 @@ class CTransactions(models.Model):
 	date_tr 		= models.DateTimeField()
 	lesson			= models.ForeignKey('ActivityType', on_delete=models.CASCADE, blank=True, null=True)
 	untill		 	= models.DateField(blank=True, null=True)#default=(date.now()+timedelta(month=1))
+	
 	class TypeOfTr(models.TextChoices):
-		CHARGE 		= "charge", "Payment: +n lessons"
-		VISIT  		= "visit",  "Visit: -1 lesson from the account"
+		CHARGE 	= "+", "Payment"
+		VISIT  	= "-", "Visit ~ -1 lesson from the account"
 	type_of_tr		= models.CharField (max_length=9, choices=TypeOfTr.choices, default=TypeOfTr.CHARGE, blank=False, null=False)
 
 
