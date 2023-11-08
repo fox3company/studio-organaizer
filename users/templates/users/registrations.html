@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>Dashboard Template · Bootstrap v5.0</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
+
+    {%load static %}
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" type="text/css" href="{%static 'lessons/css/bootstrap/bootstrap.min.css'%}">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }  
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" type="text/css" href="{%static 'lessons/css/dashboard.css'%}">
+  </head>
+  <body>    
+    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+      <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">#{{user.id}} {{user.first_name}} {{user.last_name}}</a>
+      <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
+      <div class="navbar-nav">
+        <div class="nav-item text-nowrap">
+          <a class="nav-link px-3" href="{%url 'logout' %}">Sign out</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+          <div class="position-sticky pt-3">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="{%url 'now_week_lessons' %}">
+                  <span data-feather="home"></span>
+                  Main
+                </a>
+              </li>
+
+<!--               <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="shopping-cart"></span>
+                  Products
+                </a>
+              </li> -->
+              <li class="nav-item">
+                <a class="nav-link" href="{%url 'profile' %}">
+                  <span data-feather="user"></span>
+                  Profile
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#">
+                  <span data-feather="check-circle"></span>
+                  Registrations & Visits
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{%url 'payments' %}">
+                  <span data-feather="credit-card"></span>
+                  Payments
+                </a>
+              </li>
+<!--               <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="bar-chart-2"></span>
+                  Reports
+                </a>
+              </li> -->
+<!--               <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="layers"></span>
+                  Integrations
+                </a>
+              </li> -->
+            </ul>
+
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>General information</span>
+<!--               <a class="link-secondary" href="#" aria-label="Add a new report">
+                <span data-feather="clipboard"></span>
+              </a> -->
+            </h6>
+            <ul class="nav flex-column mb-2">
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="users"></span>
+                  Teachers
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{%url 'studios' %}">
+                  <span data-feather="map-pin"></span>
+                  Studios
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{%url 'activity_types' %}">
+                  <span data-feather="search"></span>
+                  Activity types
+                </a>
+              </li>
+<!--               <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="film"></span>
+                  Media
+                </a>
+              </li> -->
+            </ul>
+          </div>
+        </nav>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <!-- {lessons} -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4 my-3 border-bottom">
+              <h5>Visits & Registrations</h5>
+          {% if lessons %}
+              <p class="mx-auto my-auto" >     
+                {{left_border|date:'d F '}}-{{right_border|date:' d F '}} {{now_month|date:'F'}} [{{page_year}}] 
+              </p>  
+              <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                  <a 
+                  href="{%if previous_month %} {{previous_month}} {% endif %}"
+                    {%if previous_month is None %}
+                      class="invisible btn btn-sm btn-outline-secondary"
+                    {%else %}
+                      class="btn btn-sm btn-outline-secondary"  
+                    {% endif %}
+                  >
+                    Previos Month
+                  </a>
+                  <a 
+                    href="{%if next_month %} {{next_month}} {% endif %}"
+                    {%if next_month is None %}
+                      class="d-none btn btn-sm btn-outline-secondary"
+                    {%else %}
+                      class="btn btn-sm btn-outline-secondary"  
+                    {% endif %} 
+                  >
+                    Next Month
+                  </a>
+                </div>
+              </div>
+            </div>
+            <table class="table mb-4">
+              <thead> 
+                <th scope="col" >
+                  &nbsp;&nbsp;&nbsp;
+                </th>
+                <th scope="col" >
+                  <p>Activity</p> 
+                </th>
+                <th scope="col" >
+                  <p>Teacher</p>  
+                </th>
+                <th scope="col" >
+                  <p>Date</p> 
+                </th>
+                <th scope="col" >
+                  <p>Time</p> 
+                </th>
+                <th scope="col" >
+                  <p>Spots</p>  
+                </th>
+                <th scope="col">
+                  <p>Location</p> 
+                </th>
+                <th scope="col" >
+                  &nbsp;&nbsp;&nbsp;
+                </th>
+              </thead>
+              <tbody>
+              {% for lesson in lessons %}
+                <tr     
+                {% if lesson.client_registration %}
+                  {%if lesson.is_passed %}
+                    class="table-secondary bg-gradient"
+                    {%if lesson.missed is True %}
+                      class="table-danger"
+                    {% endif %}
+                  {%elif lesson.is_today is True and lesson.missed is False and lesson.client_registration is True%}
+                    class="table-warning bg-gradient"
+                  {%elif lesson.is_today is False and lesson.missed is False %}
+                    class="table-success bg-gradient"
+                  {% endif %}
+              
+                {%elif lesson.client_in_queue %}
+
+                {% endif %}
+                >           
+                  <td>
+                    {%if lesson.is_passed %}
+                      <span class="badge bg-light text-dark">passed</span>
+                    {%else %}
+                      {%if lesson.is_today %}
+                        <span class="badge bg-info text-dark">today</span><br>
+                      {% endif %}
+                      {%if lesson.client_registration %} <!-- lesson.is_future_lesson and  -->
+                        <span class="badge bg-success">registed</span>
+                      {% endif %}
+                      {%if lesson.client_in_queue %}
+                        <span class="badge bg-warning text-dark">in the queue</span>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                  <td>
+                    <p>{{lesson.activity.activity_name}}</p>
+                  </td>
+                  <td>
+                    <p>{{lesson.teacher.first_name}} {{lesson.teacher.last_name}}</p>
+                  </td>
+                  <td>
+                    <p>{{lesson.start_date|date:"d F, D"}}</p>
+                  </td>
+                  <td>
+                    <p class="">
+                      {{lesson.start_time|time:"H:i"}} 
+                    </br>
+                      <span class="blockquote-footer">end at {{lesson.end_at|time:"H:i"}}</span>
+                    </p>
+                      
+                  </td>
+                  <td>
+                    <p>{{lesson.q_of_registred_users}}/{{lesson.quantity}}</p>
+                  </td>
+                  <td>
+                    <p>{{lesson.studio.geo_location.name}}</p>
+                  </td>
+                  <td>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{lesson.id}}"        
+                    {%if lesson.is_passed %}
+                      class='btn btn-secondary'
+                    {% else %}
+                      class='btn btn-primary'
+                    {% endif %}             
+                    >
+                      more
+                    </button>
+                    <span
+                    {%if lesson.missed is True %}
+                    class="text-danger"
+                    {% endif %}
+                    >
+                    {%if lesson.missed is True %}
+                    |
+                    {% endif %}
+                    </span> 
+
+
+                    <!-- MODAL -->          
+                    <div class="modal fade" id="staticBackdrop{{lesson.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel{{lesson.id}}" aria-hidden="true"
+                    {% if lesson.client_registration %}
+                      class="registred"
+                    {% endif %}
+                    >
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <div class="modal-title" id="staticBackdropLabel{{lesson.id}}"> <h5>{{lesson.activity.activity_name}}</h5><p>{{lesson.start_date|date:"d F, l, o"}}</p> 
+                            </div>
+
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                  
+                          </div>
+                          <div class="modal-body">
+                            <div class="container">
+                              <div class="row">
+                                <div class="col">
+                                  <img src="{{lesson.activity.meadia_repr.url}}" width="400px" height="350px">
+                                </div>
+                                <div class="col">
+                                  {{lesson.activity.about}}
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col">&nbsp;&nbsp;&nbsp;</div>
+                                <div class="col">&nbsp;&nbsp;&nbsp;</div>
+                              </div>
+                              <div class="row">
+                                <div class="col">
+                                  Teacher: <a href="#">{{lesson.teacher.first_name}} {{lesson.teacher.last_name}}</a>
+                                  </br>
+                                </div>                    
+                              </div>
+                              <div class="row">
+                                <div class="col">
+                                  <p> 
+                                    Location:</br> 
+                                    <a href="{{lesson.studio.geo_location.geo}}">{{lesson.studio.geo_location.name}}</a>
+                                  </p>
+                                </div>
+                                <div class="col">
+                                  <p>
+                                    Studio:</br>
+                                    {{lesson.studio.number}}
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col">                         
+                                </div>
+                                <div class="col">
+                                  <p>
+                                    Start:  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{lesson.start_time|date:"H:i"}} 
+                                  </br>
+                                    Duration: &nbsp;{{lesson.duration}} hours
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col"></div>
+                                <div class="col">
+                                  <p>
+                                    Participants: {{lesson.q_of_registred_users}}/{{lesson.quantity}}
+                                  </p>        
+                                </div>
+                              </div>
+                              
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+
+                        {% if lesson.client_in_queue %}
+                          <form id="cancelation_queue_form" method="POST" action="#">
+                              {% csrf_token %}
+                                <input type="text" class="d-none invisible" name="line_type" value="queue">
+                                <input type="text" class="d-none invisible" name="operation" value="-">
+                                <input type="text" class="d-none invisible" name='lesson_id' value="{{lesson.id}}">                       
+                                <label for='button_cancelation'>
+                                  {%if lesson.is_passed is True %}                            
+                                <span>
+                                  Sorry, but the lesson is already passed  
+                                </span>  
+                              {% else %}  
+                                    You're in the queue for this lesson
+                                  {% endif %} 
+                                </label>    
+                            {%if lesson.is_passed %}
+
+                            {% else %}
+                              <button id="button_cancelation" type="submit" class="btn btn-warning"> 
+                                    Get out of the queue
+                              </button> 
+                            {% endif %}         
+                              </form>                                       
+                        {% else %} 
+                          {% if lesson.q_of_registred_users == lesson.quantity and lesson.client_registration == False %}
+                                <form id="sign_up_queue_form" method="POST" action="#">
+                                  {% csrf_token %}
+                                  <input type="text" class="d-none invisible" name="line_type" value="queue">
+                                  <input type="text" class="d-none invisible" name="operation" value="+">
+                                  <input type="text" class="d-none invisible" name=lesson_id value="{{lesson.id}}">
+                                  <label for='button_sign_up'>
+                                    {%if lesson.is_passed is True %}
+                                  <span> 
+                                    Sorry, but the lesson is already passed
+                                  </span>           
+                                {% else %}  
+                                  <button id="button_sign_up"type="submit" class="btn btn-warning">
+                                    To get in queue
+                                  </button>
+                                    {% endif %} 
+                                  </label>  
+                                </form>               
+                              {% else %}
+                                {% if lesson.client_registration %}
+                              <form id="cancelation_form" method="POST" action="#">
+                                  {% csrf_token %}
+                                    <input type="text" class="d-none invisible" name="line_type" value="order">
+                                    <input type="text" class="d-none invisible" name="operation" value="-">
+                                    <input type="text" class="d-none invisible" name='lesson_id' value="{{lesson.id}}">                       
+                                    <label for='button_cancelation'>
+                                      {%if lesson.is_passed is True %}
+                                        {%if lesson.missed is True %}
+                                      <span class="badge rounded-pill bg-danger">missed</span>
+                                      <span>
+                                        Sorry, but the lesson is already passed  
+                                      </span>  
+                                    {%else%}
+                                      <span class="badge bg-secondary">visited</span>
+                                      <span>
+                                        Lesson is already passed  
+                                      </span> 
+                                    {% endif %}     
+                                  {% else %}  
+                                        You're registred for this lesson
+                                      {% endif %} 
+                                    </label>    
+                                {%if lesson.is_passed %}
+
+                                {% else %}
+                                  <button id="button_cancelation" type="submit" class="btn btn-primary"
+                                      {%if lesson.can_unsubscribe is False %}         
+                                      disabled  
+                                  {% endif %}                   
+                                      > 
+                                        Unsubscribe
+                                  </button> 
+                                {% endif %}         
+                                  </form>                                       
+                            {% else %} 
+                                  <form id="sign_up_form" method="POST" action="#">
+                                    {% csrf_token %}
+                                    <input type="text" class="d-none invisible" name="line_type" value="order">
+                                    <input type="text" class="d-none invisible" name="operation" value="+">
+                                    <input type="text" class="d-none invisible" name=lesson_id value="{{lesson.id}}">
+                                    <label for='button_sign_up'>
+                                      {%if lesson.is_passed is True %}
+                                    <span> 
+                                      Sorry, but the lesson is already passed
+                                    </span>           
+                                  {% else %}  
+                                    <button id="button_sign_up"type="submit" class="btn btn-primary">
+                                      Sign Up
+                                    </button>
+                                      {% endif %} 
+                                    </label>  
+                                  </form>   
+                                {% endif %}
+                            {% endif %} 
+                        {% endif %}               
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>       
+                </tr>
+              {% endfor%}
+              </tbody>
+            </table>
+          {% endif %}
+          {% if queue_lessons %}
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4 my-5 border-bottom">
+              <h4>Waiting for spots</h4>
+            </div>
+            <table class="table mb-4">
+              <thead> 
+                <th scope="col" >
+                  &nbsp;&nbsp;&nbsp;
+                </th>
+                <th scope="col" >
+                  <p>Activity</p> 
+                </th>
+                <th scope="col" >
+                  <p>Teacher</p>  
+                </th>
+                <th scope="col" >
+                  <p>Date</p> 
+                </th>
+                <th scope="col" >
+                  <p>Time</p> 
+                </th>
+                <th scope="col" >
+                  <p>Spots</p>  
+                </th>
+                <th scope="col">
+                  <p>Location</p> 
+                </th>
+                <th scope="col" >
+                  &nbsp;&nbsp;&nbsp;
+                </th>
+              </thead>
+              <tbody>
+              {% for lesson in queue_lessons %}
+                <tr     
+                {% if lesson.client_registration %}
+                  {%if lesson.is_passed %}
+                    class="table-secondary bg-gradient"
+                    {%if lesson.missed is True %}
+                      class="table-danger"
+                    {% endif %}
+                  {%elif lesson.is_today is True and lesson.missed is False and lesson.client_registration is True%}
+                    class="table-warning bg-gradient"
+                  {%elif lesson.is_today is False and lesson.missed is False %}
+                    class="table-success bg-gradient"
+                  {% endif %}
+              
+                {%elif lesson.client_in_queue %}
+
+                {% endif %}
+                >           
+                  <td>
+                    {%if lesson.is_passed %}
+                      <span class="badge bg-light text-dark">passed</span>
+                    {%else %}
+                      {%if lesson.is_today %}
+                        <span class="badge bg-info text-dark">today</span><br>
+                      {% endif %}
+                      {%if lesson.client_registration %} <!-- lesson.is_future_lesson and  -->
+                        <span class="badge bg-success">registed</span>
+                      {% endif %}
+                      {%if lesson.client_in_queue %}
+                        <span class="badge bg-warning text-dark">in the queue</span>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                  <td>
+                    <p>{{lesson.activity.activity_name}}</p>
+                  </td>
+                  <td>
+                    <p>{{lesson.teacher.first_name}} {{lesson.teacher.last_name}}</p>
+                  </td>
+                  <td>
+                    <p>{{lesson.start_date|date:"d F, D"}}</p>
+                  </td>
+                  <td>
+                    <p class="">
+                      {{lesson.start_time|time:"H:i"}} 
+                    </br>
+                      <span class="blockquote-footer">end at {{lesson.end_at|time:"H:i"}}</span>
+                    </p>
+                      
+                  </td>
+                  <td>
+                    <p>{{lesson.q_of_registred_users}}/{{lesson.quantity}}</p>
+                  </td>
+                  <td>
+                    <p>{{lesson.studio.geo_location.name}}</p>
+                  </td>
+                  <td>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{lesson.id}}"        
+                    {%if lesson.is_passed %}
+                      class='btn btn-secondary'
+                    {% else %}
+                      class='btn btn-primary'
+                    {% endif %}             
+                    >
+                      more
+                    </button>
+                    <span
+                    {%if lesson.missed is True %}
+                    class="text-danger"
+                    {% endif %}
+                    >
+                    {%if lesson.missed is True %}
+                    |
+                    {% endif %}
+                    </span> 
+
+
+                    <!-- MODAL -->          
+                    <div class="modal fade" id="staticBackdrop{{lesson.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel{{lesson.id}}" aria-hidden="true"
+                    {% if lesson.client_registration %}
+                      class="registred"
+                    {% endif %}
+                    >
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <div class="modal-title" id="staticBackdropLabel{{lesson.id}}"> <h5>{{lesson.activity.activity_name}}</h5><p>{{lesson.start_date|date:"d F, l, o"}}</p> 
+                            </div>
+
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                  
+                          </div>
+                          <div class="modal-body">
+                            <div class="container">
+                              <div class="row">
+                                <div class="col">
+                                  <img src="{{lesson.activity.meadia_repr.url}}" width="400px" height="350px">
+                                </div>
+                                <div class="col">
+                                  {{lesson.activity.about}}
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col">&nbsp;&nbsp;&nbsp;</div>
+                                <div class="col">&nbsp;&nbsp;&nbsp;</div>
+                              </div>
+                              <div class="row">
+                                <div class="col">
+                                  Teacher: <a href="#">{{lesson.teacher.first_name}} {{lesson.teacher.last_name}}</a>
+                                  </br>
+                                </div>                    
+                              </div>
+                              <div class="row">
+                                <div class="col">
+                                  <p> 
+                                    Location:</br> 
+                                    <a href="{{lesson.studio.geo_location.geo}}">{{lesson.studio.geo_location.name}}</a>
+                                  </p>
+                                </div>
+                                <div class="col">
+                                  <p>
+                                    Studio:</br>
+                                    {{lesson.studio.number}}
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col">                         
+                                </div>
+                                <div class="col">
+                                  <p>
+                                    Start:  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{lesson.start_time|date:"H:i"}} 
+                                  </br>
+                                    Duration: &nbsp;{{lesson.duration}} hours
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col"></div>
+                                <div class="col">
+                                  <p>
+                                    Participants: {{lesson.q_of_registred_users}}/{{lesson.quantity}}
+                                  </p>        
+                                </div>
+                              </div>
+                              
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+
+                        {% if lesson.client_in_queue %}
+                          <form id="cancelation_queue_form" method="POST" action="#">
+                              {% csrf_token %}
+                                <input type="text" class="d-none invisible" name="line_type" value="queue">
+                                <input type="text" class="d-none invisible" name="operation" value="-">
+                                <input type="text" class="d-none invisible" name='lesson_id' value="{{lesson.id}}">                       
+                                <label for='button_cancelation'>
+                                  {%if lesson.is_passed is True %}                            
+                                <span>
+                                  Sorry, but the lesson is already passed  
+                                </span>  
+                              {% else %}  
+                                    You're in the queue for this lesson
+                                  {% endif %} 
+                                </label>    
+                            {%if lesson.is_passed %}
+
+                            {% else %}
+                              <button id="button_cancelation" type="submit" class="btn btn-warning"> 
+                                    Get out of the queue
+                              </button> 
+                            {% endif %}         
+                              </form>                                       
+                        {% else %} 
+                          {% if lesson.q_of_registred_users == lesson.quantity and lesson.client_registration == False %}
+                                <form id="sign_up_queue_form" method="POST" action="#">
+                                  {% csrf_token %}
+                                  <input type="text" class="d-none invisible" name="line_type" value="queue">
+                                  <input type="text" class="d-none invisible" name="operation" value="+">
+                                  <input type="text" class="d-none invisible" name=lesson_id value="{{lesson.id}}">
+                                  <label for='button_sign_up'>
+                                    {%if lesson.is_passed is True %}
+                                  <span> 
+                                    Sorry, but the lesson is already passed
+                                  </span>           
+                                {% else %}  
+                                  <button id="button_sign_up"type="submit" class="btn btn-warning">
+                                    To get in queue
+                                  </button>
+                                    {% endif %} 
+                                  </label>  
+                                </form>               
+                              {% else %}
+                                {% if lesson.client_registration %}
+                              <form id="cancelation_form" method="POST" action="#">
+                                  {% csrf_token %}
+                                    <input type="text" class="d-none invisible" name="line_type" value="order">
+                                    <input type="text" class="d-none invisible" name="operation" value="-">
+                                    <input type="text" class="d-none invisible" name='lesson_id' value="{{lesson.id}}">                       
+                                    <label for='button_cancelation'>
+                                      {%if lesson.is_passed is True %}
+                                        {%if lesson.missed is True %}
+                                      <span class="badge rounded-pill bg-danger">missed</span>
+                                      <span>
+                                        Sorry, but the lesson is already passed  
+                                      </span>  
+                                    {%else%}
+                                      <span class="badge bg-secondary">visited</span>
+                                      <span>
+                                        Lesson is already passed  
+                                      </span> 
+                                    {% endif %}     
+                                  {% else %}  
+                                        You're registred for this lesson
+                                      {% endif %} 
+                                    </label>    
+                                {%if lesson.is_passed %}
+
+                                {% else %}
+                                  <button id="button_cancelation" type="submit" class="btn btn-primary"
+                                      {%if lesson.check_cancelation_possibility is False %}         
+                                      disabled  
+                                  {% endif %}                   
+                                      > 
+                                        Unsubscribe
+                                  </button> 
+                                {% endif %}         
+                                  </form>                                       
+                            {% else %} 
+                                  <form id="sign_up_form" method="POST" action="#">
+                                    {% csrf_token %}
+                                    <input type="text" class="d-none invisible" name="line_type" value="order">
+                                    <input type="text" class="d-none invisible" name="operation" value="+">
+                                    <input type="text" class="d-none invisible" name=lesson_id value="{{lesson.id}}">
+                                    <label for='button_sign_up'>
+                                      {%if lesson.is_passed is True %}
+                                    <span> 
+                                      Sorry, but the lesson is already passed
+                                    </span>           
+                                  {% else %}  
+                                    <button id="button_sign_up"type="submit" class="btn btn-primary">
+                                      Sign Up
+                                    </button>
+                                      {% endif %} 
+                                    </label>  
+                                  </form>   
+                                {% endif %}
+                            {% endif %} 
+                        {% endif %}               
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>       
+                </tr>
+              {% endfor%}
+              </tbody>
+            </table>
+          {% endif %}
+        </main>
+      </div>
+    </div>
+      <script type="text/javascript" src="{%static 'lessons/js/bootstrap/bootstrap.bundle.min.js'%}"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="{%static 'lessons/js/dashboard.js'%}"></script>
+
+  </body>
+</html>

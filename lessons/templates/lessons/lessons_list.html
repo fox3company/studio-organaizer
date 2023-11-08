@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title> Lessons tdst View</title>
+	{%load static %}
+	<link rel="stylesheet" type="text/css" href="{%static 'lessons/css/bootstrap/bootstrap.min.css'%}">
+	<link rel="stylesheet" type="text/css" href="{%static 'lessons/css/lessons_list.css'%}">
+	<!-- <script type="text/javascript" src="{%static 'lessons/js/lessons_list.js' %}"></script> -->
+</head>
+<body>
+	<header class="bg-info navbar">
+			<div class="nav-item">
+				<div class="text-center">#{{user.id}} {{user.first_name}} {{user.last_name}}</div>	
+				<!-- <p>Phone number: {{user.phone_number}}</p> -->
+				<!-- <p>FIO: {{user.first_name}} {{user.last_name}}</p> -->
+			</div>
+			<button class="nav-item btn float-end">
+				<a class="nav-link link-dark" href="{%url 'logout' %}">LogOut</a>
+			</button>
+	</header>
+	<main class="">
+		<div class="row">
+			<div class="col-2" style="background-color: #e3f2fd;">
+				<nav class="nav flex-column">
+					<div class="nav-item">
+						<a class='nav-link' href="#">Main</a>	
+					</div>
+					<div class="nav-item">
+						<a href="#" class='nav-link' >Profile</a>	
+				</nav>	
+			</div>
+			<div class="col-10">
+				<div class="row">
+					<div class="pagination">
+						<div class="page-item">
+							<a 
+							href="
+							{%if previous_week %}
+							{{previous_week}}
+							{% endif %}"
+							{%if previous_week is None %}
+							class="invisible page-link"
+							{% endif %}
+							{{previous_week}}
+							class="page-link"
+							>
+								Previous Week
+							</a>
+						</div>
+						<div class="container col">
+							<!-- <p class=text-center>Today: { now 'l - j F' }</p> -->
+							<p class=text-center >
+								Week: {{now_week}} [{{now_year}}] 
+								</br> 					
+								{{left_border|date:'d F '}}-{{right_border|date:' d F '}} {{now_month|date:'F'}}
+							</p>	
+						</div>
+						<div class="page-item">
+							<a href="
+							{%if next_week %}
+								{{next_week}}
+							{% endif %}"
+							{%if next_week is None %}
+								class="invisible page-link"
+							{% endif %}
+							class = "page-link"
+							>
+								Next Week
+							</a>
+						</div>
+					</div>
+					<div class="row">
+						<p class=text-start >Today: {% now 'l j F' %} = Week:{% now 'W [o]' %}</p>
+					</div>
+					<div class="row">
+						<div class="col">
+							&nbsp;&nbsp;&nbsp;
+						</div>
+					</div>
+					<h1>
+
+					</h1>
+					<table class="table caption-top">
+						<caption></caption>
+						<thead>	
+							<th scope="col" >
+								&nbsp;&nbsp;&nbsp;
+							</th>
+							<th scope="col" >
+								<p>Activity</p>	
+							</th>
+							<th scope="col" >
+								<p>Teacher</p>	
+							</th>
+							<th scope="col" >
+								<p>Date</p>	
+							</th>
+							<th scope="col" >
+								<p>Time</p>	
+							</th>
+							<th scope="col" >
+								<p>Spots</p>	
+							</th>
+							<th scope="col">
+								<p>Location</p>	
+							</th>
+							<th scope="col" >
+								&nbsp;&nbsp;&nbsp;
+							</th>
+						</thead>
+						<tbody>
+						{% for lesson in lessons %}
+							<tr 		
+							{% if lesson.client_registration %}
+								{%if lesson.is_passed %}
+									class="table-secondary bg-gradient"
+									{%if lesson.missed is True %}
+										class="table-danger"
+									{% endif %}
+								{%elif lesson.is_today is True and lesson.missed is False and lesson.client_registration is True%}
+									class="table-warning bg-gradient"
+								{%elif lesson.is_today is False and lesson.missed is False %}
+									class="table-success bg-gradient"
+								{% endif %}
+						
+							{%elif lesson.client_in_queue %}
+
+							{% endif %}
+							>						
+								<td>
+									{%if lesson.is_passed %}
+										<span class="badge bg-light text-dark">passed</span>
+									{%else %}
+										{%if lesson.is_today %}
+											<span class="badge bg-info text-dark">today</span><br>
+										{% endif %}
+										{%if lesson.client_registration %} <!-- lesson.is_future_lesson and  -->
+											<span class="badge bg-success">registed</span>
+										{% endif %}
+										{%if lesson.client_in_queue %}
+											<span class="badge bg-warning text-dark">in the queue</span>
+										{% endif %}
+									{% endif %}
+								</td>
+								<td>
+									<p>{{lesson.activity.activity_name}}</p>
+								</td>
+								<td>
+									<p>{{lesson.teacher.first_name}} {{lesson.teacher.last_name}}</p>
+								</td>
+								<td>
+									<p>{{lesson.start_date|date:"d F, D"}}</p>
+								</td>
+								<td>
+									<p class="">
+										{{lesson.start_time|time:"H:i"}} 
+									</br>
+										<span class="blockquote-footer">end at {{lesson.end_at|time:"H:i"}}</span>
+									</p>
+										
+								</td>
+								<td>
+									<p>{{lesson.q_of_registred_users}}/{{lesson.quantity}}</p>
+								</td>
+								<td>
+									<p>{{lesson.studio.geo_location.name}}</p>
+								</td>
+								<td>
+									<button type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{lesson.id}}"				
+									{%if lesson.is_passed %}
+										class='btn btn-secondary'
+									{% else %}
+										class='btn btn-primary'
+									{% endif %}							
+									>
+										<h5>more</h5>
+									</button>
+									<span
+									{%if lesson.missed is True %}
+									class="text-danger"
+									{% endif %}
+									>
+									{%if lesson.missed is True %}
+									|
+									{% endif %}
+									</span>	
+
+
+									<!-- MODAL -->					
+									<div class="modal fade" id="staticBackdrop{{lesson.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel{{lesson.id}}" aria-hidden="true"
+									{% if lesson.client_registration %}
+										class="registred"
+									{% endif %}
+									>
+									  <div class="modal-dialog">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <div class="modal-title" id="staticBackdropLabel{{lesson.id}}">	<h5>{{lesson.activity.activity_name}}</h5><p>{{lesson.start_date|date:"d F, l, o"}}</p>	
+									        </div>
+
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>						      
+									      </div>
+									      <div class="modal-body">
+									        <div class="container">
+									        	<div class="row">
+									        		<div class="col">
+									        			<img src="{{lesson.activity.meadia_repr.url}}" width="400px" height="350px">
+									        		</div>
+									        		<div class="col">
+									        			{{lesson.activity.about}}
+									        		</div>
+									        	</div>
+									        	<div class="row">
+									        		<div class="col">&nbsp;&nbsp;&nbsp;</div>
+									        		<div class="col">&nbsp;&nbsp;&nbsp;</div>
+									        	</div>
+									        	<div class="row">
+									        		<div class="col">
+									        			Teacher: <a href="#">{{lesson.teacher.first_name}} {{lesson.teacher.last_name}}</a>
+									        			</br>
+									        		</div>						        
+									        	</div>
+									        	<div class="row">
+									        		<div class="col">
+									        			<p>	
+									        				Location:</br> 
+										        			<a href="{{lesson.studio.geo_location.geo}}">{{lesson.studio.geo_location.name}}</a>
+										        		</p>
+									        		</div>
+									        		<div class="col">
+									        			<p>
+									        				Studio:</br>
+									        				{{lesson.studio.number}}
+									        			</p>
+									        		</div>
+									        	</div>
+									        	<div class="row">
+									        		<div class="col">						        			
+									        		</div>
+									        		<div class="col">
+									        			<p>
+									        				Start: 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{lesson.start_time|date:"H:i"}} 
+									        			</br>
+									        				Duration: &nbsp;{{lesson.duration}} hours
+									        			</p>
+									        		</div>
+									        	</div>
+									        	<div class="row">
+									        		<div class="col"></div>
+									        		<div class="col">
+									        			<p>
+									        				Participants: {{lesson.q_of_registred_users}}/{{lesson.quantity}}
+									        			</p>				
+									        		</div>
+									        	</div>
+									        	
+									        </div>
+									      </div>
+									      <div class="modal-footer">
+									        <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+
+											{% if lesson.client_in_queue %}
+												<form id="cancelation_queue_form" method="POST" action="#">
+									        	{% csrf_token %}
+									        		<input type="text" class="d-none invisible" name="line_type" value="queue">
+										        	<input type="text" class="d-none invisible" name="operation" value="-">
+										        	<input type="text" class="d-none invisible" name='lesson_id' value="{{lesson.id}}">							        	
+										        	<label for='button_cancelation'>
+										        		{%if lesson.is_passed is True %}									        	
+															<span>
+																Sorry, but the lesson is already passed  
+															</span>  
+														{% else %}	
+										        			You're in the queue for this lesson
+										        		{% endif %}	
+										        	</label>		
+													{%if lesson.is_passed %}
+
+													{% else %}
+														<button id="button_cancelation" type="submit" class="btn btn-warning"> 
+										        			Get out of the queue
+										        		</button>	
+													{% endif %}					
+									        	</form>						        					        	
+											{% else %} 
+												{% if lesson.q_of_registred_users == lesson.quantity and lesson.client_registration == False %}
+											        <form id="sign_up_queue_form" method="POST" action="#">
+											        	{% csrf_token %}
+											        	<input type="text" class="d-none invisible" name="line_type" value="queue">
+											        	<input type="text" class="d-none invisible" name="operation" value="+">
+											        	<input type="text" class="d-none invisible" name=lesson_id value="{{lesson.id}}">
+											        	<label for='button_sign_up'>
+											        		{%if lesson.is_passed is True %}
+																<span> 
+																	Sorry, but the lesson is already passed
+																</span>						
+															{% else %}	
+																<button id="button_sign_up"type="submit" class="btn btn-warning">
+																	To get in queue
+																</button>
+											        		{% endif %}	
+											        	</label>	
+											        </form>					      
+										        {% else %}
+											        {% if lesson.client_registration %}
+														<form id="cancelation_form" method="POST" action="#">
+											        	{% csrf_token %}
+											        		<input type="text" class="d-none invisible" name="line_type" value="order">
+												        	<input type="text" class="d-none invisible" name="operation" value="-">
+												        	<input type="text" class="d-none invisible" name='lesson_id' value="{{lesson.id}}">							        	
+												        	<label for='button_cancelation'>
+												        		{%if lesson.is_passed is True %}
+												        			{%if lesson.missed is True %}
+																		<span class="badge rounded-pill bg-danger">missed</span>
+																		<span>
+																			Sorry, but the lesson is already passed  
+																		</span>  
+																	{%else%}
+																		<span class="badge bg-secondary">visited</span>
+																		<span>
+																			Lesson is already passed  
+																		</span> 
+																	{% endif %}	  	
+																{% else %}	
+												        			You're registred for this lesson
+												        		{% endif %}	
+												        	</label>		
+															{%if lesson.is_passed %}
+
+															{% else %}
+																<button id="button_cancelation" type="submit" class="btn btn-primary"
+													        	{%if lesson.check_cancelation_possibility is False %}					
+																		disabled	
+																{% endif %}										
+													        	> 
+												        			Unsubscribe
+												        		</button>	
+															{% endif %}					
+											        	</form>						        					        	
+													{% else %} 
+												        <form id="sign_up_form" method="POST" action="#">
+												        	{% csrf_token %}
+												        	<input type="text" class="d-none invisible" name="line_type" value="order">
+												        	<input type="text" class="d-none invisible" name="operation" value="+">
+												        	<input type="text" class="d-none invisible" name=lesson_id value="{{lesson.id}}">
+												        	<label for='button_sign_up'>
+												        		{%if lesson.is_passed is True %}
+																	<span> 
+																		Sorry, but the lesson is already passed
+																	</span>						
+																{% else %}	
+																	<button id="button_sign_up"type="submit" class="btn btn-primary">
+																		Sign Up
+																	</button>
+												        		{% endif %}	
+												        	</label>	
+												        </form>		
+											        {% endif %}
+											    {% endif %} 
+											{% endif %} 				      
+									      </div>
+									    </div>
+									  </div>
+									</div>
+								</td>				
+							</tr>
+						{% endfor%}
+						</tbody>
+					</table>
+				</div>
+			<div class="row">
+				<div class="col-6">&nbsp;&nbsp;&nbsp;</div>
+				<div class="col-6">
+					<div class="container">	
+						{% for subs in subs_now_and_future%}
+							<div class="accordion" id="accordionPanelsStayOpenExample{{subs.id}}">
+							  <div class="accordion-item">
+							    <h2 class="accordion-header" id="panelsStayOpen-headingOne{{subs.id}}">
+							      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne{{subs.id}}" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne{{subs.id}}">
+							        #{{subs.id}}: {{subs.remains_lessons}} lessons remains
+							      </button>
+							    </h2>
+							    <div id="panelsStayOpen-collapseOne{{subs.id}}" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne{{subs.id}}">
+							      <div class="accordion-body">
+							       	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							       	<span class="fw-lighter">From: {{subs.from_date|date:'d F, o'}}</span></br>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<span class="fw-lighter">Untill: {{subs.untill_date|date:'d F, o'}}</span></br>
+							      </div>
+							    </div>
+							  </div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+			<div class="row">&nbsp;&nbsp;&nbsp;</div>	
+	</main>
+	<!-- <footer class="bg-info navbar">
+		<div class="nav-item">
+			<div class="text-center">#{user.id} {user.first_name} {user.last_name}</div>	
+		</div>
+		<button class="nav-item btn float-end">
+			<a class="nav-link link-dark" href="{url 'logout' %}">LogOut</a>
+		</button>
+	</footer> -->
+	<script type="text/javascript" src="{%static 'lessons/js/bootstrap/bootstrap.bundle.min.js'%}"></script>
+	<script type="text/javascript" src="{%static 'lessons/js/lessons_list.js'%}"></script>
+</body>
+</html>
