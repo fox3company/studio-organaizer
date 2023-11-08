@@ -1,5 +1,8 @@
-# studio-organaizer
-This is web application, which helps to organise work of a fitness studio, and connect teachers and students in more transparent way.
+
+<h1>Studio-organaizer</h1> 
+<p>This is web application, which helps to organise work of a fitness studio, and connect teachers and students in more transparent way.</p>
+<p>The representation of main functionality you can se below.</p>
+
 ![User - Main Page 1](/README_images/Снимок%20экрана%202023-11-08%20в%2016.04.54.png)
 ![User - Main page 2](/README_images/Снимок%20экрана%202023-11-08%20в%2016.04.59.png)
 ![User - PopUp:Main page 1](/README_images/Снимок%20экрана%202023-11-08%20в%2016.05.20.png)
