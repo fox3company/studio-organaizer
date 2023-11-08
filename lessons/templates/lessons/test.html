@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title> Lessons tdst View</title>
+	{%load static %}
+	<link rel="stylesheet" type="text/css" href="{%static 'lessons/css/lessons_list.css'%}">
+	<link rel="stylesheet" type="text/css" href="{%static 'lessons/css/bootstrap/bootstrap.min.css'%}">
+	<!-- <script type="text/javascript" src="{%static 'lessons/js/lessons_list.js' %}"></script> -->
+</head>
+<body>
+	<head>
+		<p>User:#{{user.id}}</p>	
+		<p>Phone number: {{user.phone_number}}</p>
+		<p>FIO: {{user.first_name}} {{user.last_name}}</p>
+	</head>
+	<main>	
+		<table>
+			<thead>	
+				<th>
+					<p>Activity</p>	
+				</th>
+				<th>
+					<p>Teacher</p>	
+				</th>
+				<th>
+					<p>Date</p>	
+				</th>
+				<th>
+					<p>Time</p>	
+				</th>
+				<th>
+					<p>Spots</p>	
+				</th>
+				<th>
+					<p>Location</p>	
+				</th>
+			</thead>
+			<tbody>
+			{% for lesson in lessons %}
+				<tr 
+				{% if lesson.client_registration %}
+						class="registred"
+				{% endif %}
+				>
+					<td>
+						<p>{{lesson.activity.activity_name}}</p>
+					</td>
+					<td>
+						<p>{{lesson.teacher.first_name}} {{lesson.teacher.last_name}}</p>
+					</td>
+					<td>
+						<p>{{lesson.start_date|date:"d F, D"}}</p>
+					</td>
+					<td>
+						<p>{{lesson.start_time|date:"H:i"}}</p>
+					</td>
+					<td>
+						<p>{{lesson.q_of_registred_users}}/{{lesson.quantity}}</p>
+					</td>
+					<td>
+						<p>{{lesson.studio.geo_location.name}}</p>
+					</td>
+					<td>
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{lesson.id}}">
+							<h5>to participate </h5>
+						</button>
+
+						<!-- Modal -->					
+						<div class="modal fade" id="staticBackdrop{{lesson.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel{{lesson.id}}" aria-hidden="true"
+						{% if lesson.client_registration %}
+							class="registred"
+						{% endif %}
+						>
+						  <div class="modal-dialog">
+						    <div class="modal-content">
+						      <div class="modal-header">
+						        <div class="modal-title" id="staticBackdropLabel{{lesson.id}}">	<h5>{{lesson.activity.activity_name}}</h5><p>{{lesson.start_date|date:"d F, l, o"}}</p>	
+						        </div>
+
+						        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>						      
+						      </div>
+						      <div class="modal-body">
+						        <div class="container">
+						        	<div class="row">
+						        		<div class="col">
+						        			<img src="{{lesson.activity.meadia_repr.url}}" width="400px" height="350px">
+						        		</div>
+						        		<div class="col">
+						        			{{lesson.activity.about}}
+						        		</div>
+						        	</div>
+						        	<div class="row">
+						        		<div class="col">&nbsp;&nbsp;&nbsp;</div>
+						        		<div class="col">&nbsp;&nbsp;&nbsp;</div>
+						        	</div>
+						        	<div class="row">
+						        		<div class="col">
+						        			Teacher: <a href="#">{{lesson.teacher.first_name}} {{lesson.teacher.last_name}}</a>
+						        			</br>
+						        		</div>						        
+						        	</div>
+						        	<div class="row">
+						        		<div class="col">
+						        			<p>	
+						        				Location:</br> 
+							        			<a href="{{lesson.studio.geo_location.geo}}">{{lesson.studio.geo_location.name}}</a>
+							        		</p>
+						        		</div>
+						        		<div class="col">
+						        			<p>
+						        				Studio:</br>
+						        				{{lesson.studio.number}}
+						        			</p>
+						        		</div>
+						        	</div>
+						        	<div class="row">
+						        		<div class="col">						        			
+						        		</div>
+						        		<div class="col">
+						        			<p>
+						        				Start: 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{lesson.start_time|date:"H:i"}} 
+						        			</br>
+						        				Duration: &nbsp;{{lesson.duration}} hours
+						        			</p>
+						        		</div>
+						        	</div>
+						        	<div class="row">
+						        		<div class="col"></div>
+						        		<div class="col">
+						        			<p>
+						        				Participants: {{lesson.q_of_registred_users}}/{{lesson.quantity}}
+						        			</p>				
+						        		</div>
+						        	</div>
+						        	
+						        </div>
+						      </div>
+						      <div class="modal-footer">
+						        <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+						        {% if {{lesson.client_registration} %}
+									 <form id="cancelation_form" method="POST" action="#">
+						        	{% csrf_token %}
+							        	<input type="text" class="invisible" name="operation" value="-">
+							        	<input type="text" class="invisible" name=user_id value="{{user.id}}">
+							        	<input type="text" class="invisible" name=lesson_start value="smth">
+							        	<input type="text" class="invisible" name=now_time value="{{now|time:'H:i'}}">
+							        	<button id="button_cancelation" type="submit" class="btn btn-primary">Unsubscribe</button>
+						        	</form>	
+					        		{{ lesson.start_time|time:'H:i' }}
+					        		<p> You are registred for this lesson</p>	
+								{% else %} 
+							        <form id="sign_up_form" method="POST" action="#">
+							        	{% csrf_token %}
+							        	<input type="text" class="invisible" name="operation" value="+">
+							        	<input type="text" class="invisible" name=user_id value="{{user.id}}">
+							        	<button id="button_sign_up"type="submit" class="btn btn-primary">Sign Up</button>
+							        </form>		
+						        {% endif %} 				      
+						      </div>
+						    </div>
+						  </div>
+						</div>
+					</td>
+				</tr>
+			{% endfor%}
+			</tbody>
+		</table>
+	</main>
+	<script type="text/javascript" src="{%static 'lessons/js/bootstrap/bootstrap.bundle.min.js'%}"></script>
+	<script type="text/javascript" src="{%static 'lessons/js/lessons_list.js'%}"></script>
+</body>
+</html>
